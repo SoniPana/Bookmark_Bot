@@ -27,10 +27,14 @@ async def on_ready():
 
 @tree.command(guild=guild)
 async def slash(ctx: discord.Interaction, url: str):
-    server = client.get_guild(int(url[29:47]))
-    channel = client.get_channel(int(url[49:66]))
-    print(int(url[49:66]))
-    embed = discord.Embed(title=server.name, description=channel.name)
+    link = url.split('/')
+    server = client.get_guild(int(link[4]))
+    print(server)
+    channel = client.get_channel(int(link[5]))
+    print(channel)
+    message = await channel.fetch_message(int(link[6]))
+    print(message)
+    embed = discord.Embed(title=server, description=message.content)
     await ctx.response.send_message(embed=embed)
 
 client.run(token)
