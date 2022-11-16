@@ -3,23 +3,21 @@ load_dotenv()
 
 import os
 import discord
-# from dispander import dispand
-from discord.commands import Option
+from dispander import dispand, delete_dispand
 
-
-bot = discord.Bot()
-bot.load_extension('dispander')
+client = discord.Client(intents=discord.Intents.all())
 token = os.environ['TOKEN']
 id = os.environ['ID']
 channel_id = os.environ['CHANNEL_ID']
 
-@bot.slash_command(guild_ids=[id], description="退出")
-async def bookmark(ctx,
-               url: Option(str, 'URLを入力して下さい')
-):
-    # embed = discord.Embed(description = f'[test]({url})')
-    # await ctx.respond(embed=embed)
-    await ctx.respond(url)
-    await bot.close()
+@client.event
+async def on_message(message):
+    if message.author.bot:
+        return
+    await dispand(message)
 
-bot.run(token)
+@client.event
+async def on_raw_reaction_add(payload):
+    await delete_dispand(client, payload=payload)
+
+client.run(token)
