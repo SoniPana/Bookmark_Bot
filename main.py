@@ -25,7 +25,7 @@ async def on_ready():
     await tree.sync(guild=guild)
     loop.start()
 
-@tree.command(guild=guild)
+@tree.command(name='bookmark', description='メッセージリンクから情報取得・出力', guild=guild)
 async def slash(ctx: discord.Interaction, url: str):
     link = url.split('/')
     server = client.get_guild(int(link[4]))
