@@ -5,17 +5,14 @@ import os
 import discord
 from discord import app_commands
 from discord.ext import tasks
-from dispander import dispand
+
 
 intents = discord.Intents.default()
 intents.message_content = True
-# client = discord.Client(intents=discord.Intents.all())
 client = discord.Client(intents=intents)
-token = os.environ['TOKEN']
-id = os.environ['ID']
-guild=discord.Object(id)
-channel_id = os.environ['CHANNEL_ID']
 tree = app_commands.CommandTree(client)
+token = os.environ['TOKEN']
+guild = discord.Object(os.environ['ID'])
 
 @tasks.loop(seconds=10)
 async def loop():
@@ -25,27 +22,20 @@ async def on_ready():
     await tree.sync(guild=guild)
     loop.start()
 
-@tree.command(name='bookmark', description='メッセージリンクから情報取得・出力', guild=guild)
-@app_commands.describe(url='メッセージURL', memo='メモ', color='色指定')
-async def slash(ctx: discord.Interaction, url: str, memo: str=None, color: str=None):
-    link = url.split('/')
-    server = client.get_guild(int(link[4]))
-    print(f'{link[4]},{server}')
-    channel = client.get_channel(int(link[5]))
-    print(f'{link[5]},{channel}')
-    message = await channel.fetch_message(int(link[6]))
-    print(message)
-    author = await client.fetch_user(message.author.id)
-    print(author.avatar.url)
+@tree.command(name='bookmark', description='見やすい', guild=guild)
+@app_commands.describe(url='メッセージURL', title='タイトル', memo='メモ', color='色指定')
+async def slash(ctx: discord.Interaction, url: str, title: str, memo: str=None, color: str=None):
     if color == None:
         color = 'default'
-    embed = discord.Embed(title=server, description=message.content, color=eval(f'discord.Colour.{color}')())
-    embed.set_author(name=author, url=url, icon_url=author.avatar.url)
+    embed = discord.Embed(title=title, url=url, description=memo, color=eval(f'discord.Colour.{color}')())
     await ctx.response.send_message(embed=embed)
 
 @tree.command(name='help', description='ヘルプ', guild=guild)
 async def slash(ctx: discord.Interaction):
-    embed = discord.Embed(title='Bookmark_Bot', description='作成中', color=0xa6ccdd)
+    embed = discord.Embed(title='Bookmark_Bot', description='メッセージリンクを見やすくするBot', color=0xa6ccdd)
+    color_li = ['red', 'dark_red', 'lighter_grey(gray)', 'dark_grey(gray)', 'light_grey(gray)', 'darker_grey(gray)', 'og_blurple', 'blurple', 'greyple', 'dark_theme', 'fuchsia', 'yellow']
+    color = '\n'.join(color_li)
+    embed.add_field(name='・colorで使用できる色', value=color)
     await ctx.response.send_message(embed=embed)
 
 client.run(token)
