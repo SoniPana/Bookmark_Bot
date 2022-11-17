@@ -26,15 +26,26 @@ async def on_ready():
     loop.start()
 
 @tree.command(name='bookmark', description='メッセージリンクから情報取得・出力', guild=guild)
-async def slash(ctx: discord.Interaction, url: str):
+@app_commands.describe(url='メッセージURL', memo='メモ', color='色指定')
+async def slash(ctx: discord.Interaction, url: str, memo: str=None, color: str=None):
     link = url.split('/')
     server = client.get_guild(int(link[4]))
-    print(server)
+    print(f'{link[4]},{server}')
     channel = client.get_channel(int(link[5]))
-    print(channel)
+    print(f'{link[5]},{channel}')
     message = await channel.fetch_message(int(link[6]))
     print(message)
-    embed = discord.Embed(title=server, description=message.content)
+    author = await client.fetch_user(message.author.id)
+    print(author.avatar.url)
+    if color == None:
+        color = 'default'
+    embed = discord.Embed(title=server, description=message.content, color=eval(f'discord.Colour.{color}')())
+    embed.set_author(name=author, url=url, icon_url=author.avatar.url)
+    await ctx.response.send_message(embed=embed)
+
+@tree.command(name='help', description='ヘルプ', guild=guild)
+async def slash(ctx: discord.Interaction):
+    embed = discord.Embed(title='Bookmark_Bot', description='作成中', color=0xa6ccdd)
     await ctx.response.send_message(embed=embed)
 
 client.run(token)
