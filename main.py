@@ -3,7 +3,7 @@
 
 import os
 import discord
-from logging import getLogger, Formatter
+from logging import getLogger, StreamHandler, DEBUG, Formatter
 from discord import app_commands
 from discord.ext import tasks
 
@@ -18,8 +18,11 @@ tree = app_commands.CommandTree(client)
 token = os.environ['TOKEN']
 guild = discord.Object(os.environ['ID'])
 logger = getLogger(__name__)
+logger.setLevel(DEBUG)
+handler = StreamHandler()
 format = Formatter('[%(asctime)s] [%(levelname)s] %(message)s')
-logger.setFormatter(format)
+handler.setFormatter(format)
+logger.addHandler(handler)
 
 @tasks.loop(seconds=10)
 async def loop():
