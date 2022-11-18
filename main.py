@@ -33,7 +33,7 @@ async def on_ready():
     await tree.sync(guild=guild)
     loop.start()
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.competing, name=f'{str(len(client.guilds))} サーバー'))
-    logger.info(f'set up was finished. (discord.py ver = {discord.__version__})')
+    logger.info(f'set up was finished. (discord.py ver={discord.__version__})')
 
 @tree.command(name='bookmark', description='見やすい', guild=guild)
 @app_commands.describe(url='メッセージURL', title='タイトル', memo='メモ', color='色指定')
